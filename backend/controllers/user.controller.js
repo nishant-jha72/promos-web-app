@@ -148,7 +148,7 @@ const updateUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Unauthorized');
   }
 
-  const { name, email } = req.body;
+  const { name, email  , password} = req.body;
 
   const user = await User.findById(req.user._id);
 
@@ -175,6 +175,7 @@ const updateUser = asyncHandler(async (req, res) => {
   if (name) {
     user.name = name;
   }
+if (password) {if (password.length < 6) { throw new ApiError(400, 'Password must be at least 6 characters long'); } user.password = password; } 
 
   const updatedUser = await user.save();
 
