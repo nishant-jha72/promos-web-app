@@ -13,20 +13,25 @@ const allowedOrigins = [
   'http://localhost:3000',
   '*'
 ];
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     // Allow requests with no origin (like mobile apps or curl)
+//     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true // Required if you are sending cookies or tokens
-}));
+//     if (allowedOrigins.indexOf(origin) !== -1) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//   credentials: true // Required if you are sending cookies or tokens
+// }));
+
+
+app.use(cors({ origin: '*' }));
+
+
 // Middleware
 app.use(helmet()); // Security headers // Enable CORS
 app.use(cookieParser()); // Parse cookies
