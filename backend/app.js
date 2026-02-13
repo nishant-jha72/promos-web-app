@@ -8,7 +8,7 @@ require('./routes/user.routes');
 const ApiError = require('./utils/ApiError.util');
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ["http://localhost:5173", "https://promos-v1.netlify.app/"],
   credentials: true
 }));
 // Middleware
