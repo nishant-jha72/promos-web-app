@@ -6,10 +6,13 @@ const { generateAccessToken, generateRefreshToken } = require('../utils/jwtutils
 
 
 const cookieOptions = {
-  httpOnly: true, // Cannot be accessed by JavaScript (XSS protection)
-  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-  sameSite: 'strict', // CSRF protection
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
+  httpOnly: true, 
+  // MUST be true for 'none' to work. 
+  // Since Render provides HTTPS by default, you can just set this to true.
+  secure: true, 
+  // MUST be 'none' for cross-domain (Netlify -> Render)
+  sameSite: 'none', 
+  maxAge: 7 * 24 * 60 * 60 * 1000 
 };
 
 const senddetailes =  asyncHandler(async (req, res) => {
