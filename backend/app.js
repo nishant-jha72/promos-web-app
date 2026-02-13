@@ -10,7 +10,8 @@ const app = express();
 const allowedOrigins = [
   'https://promos-v1.netlify.app', // Your Netlify URL
   'http://localhost:5173',        // Your Local Development URL
-  'http://localhost:3000'
+  'http://localhost:3000',
+  '*'
 ];
 app.use(cors({
   origin: function (origin, callback) {
