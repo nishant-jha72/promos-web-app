@@ -7,9 +7,24 @@ require('dotenv').config();
 require('./routes/user.routes');
 const ApiError = require('./utils/ApiError.util');
 const app = express();
+const allowedOrigins = [
+  'https://promos-v1.netlify.app', // Your Netlify URL
+  'http://localhost:5173',        // Your Local Development URL
+  'http://localhost:3000'
+];
 app.use(cors({
-  origin: ["http://localhost:5173", "https://promos-v1.netlify.app/"],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // Required if you are sending cookies or tokens
 }));
 // Middleware
 app.use(helmet()); // Security headers // Enable CORS
