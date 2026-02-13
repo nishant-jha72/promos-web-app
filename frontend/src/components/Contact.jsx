@@ -1,10 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { Mail, Phone, MapPin, Send, MessageSquareText } from "lucide-react";
-
+// Assuming 'api' is your axios instance configured elsewhere
+// import api from "../utils/api"; 
+import api from '../api/axios';
 const Contact = () => {
-  const handleSubmit = (e) => {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    serviceType: "Facebook Ads",
+    message: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thank you! Your message has been sent.");
+
+    try {
+      // Sending only JSON details as requested
+      const response = await api.post('/users/submit', formData);
+
+      if (response.data.success) {
+        alert(response.data.message);
+        setFormData({ 
+          fullName: "", 
+          email: "", 
+          serviceType: "Facebook Ads", 
+          message: "" 
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -16,10 +46,9 @@ const Contact = () => {
           backgroundImage: `url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1920')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed' // Parallax-like effect
+          backgroundAttachment: 'fixed'
         }}
       >
-        {/* Dark Gradient Overlay for Readability */}
         <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-[2px]"></div>
       </div>
 
@@ -73,20 +102,24 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* RIGHT: GLASSMORPHISM CONTACT FORM */}
+          {/* RIGHT: CONTACT FORM */}
           <div className="relative">
             <form 
               onSubmit={handleSubmit}
-              className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl space-y-6 border border-gray-100"
+              className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl space-y-5 border border-gray-100"
             >
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Send a Message</h2>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-600 mb-2 uppercase tracking-wide">Full Name</label>
                   <input
                     type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
                     placeholder="John Doe"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-800"
                     required
                   />
                 </div>
@@ -94,19 +127,41 @@ const Contact = () => {
                   <label className="block text-sm font-bold text-gray-600 mb-2 uppercase tracking-wide">Email</label>
                   <input
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="john@example.com"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-800"
                     required
                   />
                 </div>
               </div>
 
               <div>
+                <label className="block text-sm font-bold text-gray-600 mb-2 uppercase tracking-wide">Interest</label>
+                <select 
+                  name="serviceType"
+                  value={formData.serviceType}
+                  onChange={handleChange}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all appearance-none cursor-pointer text-gray-800"
+                >
+                  <option>Facebook Ads</option>
+                  <option>Google AdSense</option>
+                  <option>Instagram Influencer</option>
+                  <option>App Promotion</option>
+                  <option>Other Service</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-sm font-bold text-gray-600 mb-2 uppercase tracking-wide">Message</label>
                 <textarea
-                  rows="5"
+                  rows="4"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   placeholder="Tell us about your project requirements..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none text-gray-800"
                   required
                 ></textarea>
               </div>

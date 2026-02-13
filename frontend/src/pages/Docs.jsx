@@ -1,7 +1,7 @@
 import React from "react";
 import profile from "../assets/profile.jpeg";
+import { useNavigate } from "react-router-dom";
 import { BookOpen, User, ShieldCheck, Cpu, ChevronRight, CheckCircle2 } from "lucide-react";
-
 const Docs = () => {
   return (
     <main className="pt-16 bg-white font-sans">
@@ -126,8 +126,8 @@ const Docs = () => {
             {[
               { name: "React.js", status: "Active" },
               { name: "Tailwind CSS", status: "Active" },
-              { name: "Appwrite", status: "Upcoming" },
-              { name: "Node.js", status: "Future" }
+              { name: "Node.js/express", status: "Active" },
+              { name: "MongoDB", status: "Active" }
             ].map((tech, i) => (
               <div key={i} className="p-6 border border-gray-100 rounded-2xl text-center hover:bg-blue-50 transition-colors">
                 <h4 className="font-bold text-gray-900 mb-2">{tech.name}</h4>

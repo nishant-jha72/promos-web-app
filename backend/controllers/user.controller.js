@@ -12,7 +12,29 @@ const cookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 };
 
+const senddetailes =  asyncHandler(async (req, res) => {
+  try {
+    const { fullName, email, serviceType, message } = req.body;
 
+    // Create a new entry in the database
+    const newInquiry = new Inquiry({
+      fullName,
+      email,
+      serviceType,
+      message
+    });
+
+    await newInquiry.save();
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Inquiry received! Our team will contact you soon." 
+    });
+  } catch (error) {
+    console.log("Error here")
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+  }
+});
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -275,5 +297,6 @@ module.exports = {
   changePassword,
   deleteUser,
   getProfile,
-  logoutUser
+  logoutUser,
+  senddetailes
 };

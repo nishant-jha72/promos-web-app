@@ -8,26 +8,30 @@ const Services_new = () => {
   const services = [
     {
       title: "Google Ads Targeting",
+      path: "/services/Google.Service", // Matches your route
       text: "We use intent-based Google Ads to reach users who are actively searching for products or services similar to yours. This ensures higher conversion and lower wastage.",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800", // Dashboard/Google Ads style
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
       icon: <Target className="text-blue-600 group-hover:text-white" size={24} />
     },
     {
       title: "Social Media Advertising",
+      path: "/services/Facebook.Service", // Matches your route
       text: "We promote products on platforms like Facebook by targeting users based on interests, behavior, and engagement patterns to build brand loyalty.",
-      image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=800", // Social Media Icons/Marketing
+      image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=800",
       icon: <Users className="text-blue-600 group-hover:text-white" size={24} />
     },
     {
       title: "Content Creator Promotion",
+      path: "/services/Insta.Service", // Matches your route
       text: "Instead of aggressive ads, we collaborate with suitable content creators who already have trust among their audience for authentic reach.",
-      image: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&q=80&w=800", // Influencer/Content creator
+      image: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&q=80&w=800",
       icon: <BarChart3 className="text-blue-600 group-hover:text-white" size={24} />
     },
     {
       title: "App & Niche Platform Ads",
+      path: "/services/AppPromotion.Service", // Matches your route
       text: "For specific products, we use niche apps and platforms where the target audience is already present, ensuring highly relevant placements.",
-      image: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80&w=800", // Mobile App interface
+      image: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80&w=800",
       icon: <Smartphone className="text-blue-600 group-hover:text-white" size={24} />
     }
   ];
@@ -77,6 +81,7 @@ const Services_new = () => {
                 text={service.text} 
                 image={service.image} 
                 icon={service.icon}
+                onClick={() => navigate(service.path)} // Navigation Logic
               />
             ))}
           </div>
@@ -133,21 +138,30 @@ const Services_new = () => {
 
 /* ---------- SMALL COMPONENTS ---------- */
 
-const ServiceBlock = ({ title, text, image, icon }) => (
-  <div className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-2xl hover:border-blue-100 transition-all">
-    <div className="h-56 w-full overflow-hidden">
+const ServiceBlock = ({ title, text, image, icon, onClick }) => (
+  <div 
+    onClick={onClick} 
+    className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-2xl hover:border-blue-200 transition-all cursor-pointer"
+  >
+    <div className="h-56 w-full overflow-hidden relative">
       <img 
         src={image} 
         alt={title} 
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
+      <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors duration-300" />
     </div>
     <div className="p-8">
       <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
         {icon}
       </div>
-      <h3 className="text-2xl font-bold mb-3 text-gray-900">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{text}</p>
+      <h3 className="text-2xl font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors">
+        {title}
+      </h3>
+      <p className="text-gray-600 leading-relaxed mb-6">{text}</p>
+      <div className="flex items-center text-blue-600 font-bold gap-2">
+        Learn More <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+      </div>
     </div>
   </div>
 );

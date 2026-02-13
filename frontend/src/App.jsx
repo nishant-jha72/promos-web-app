@@ -11,7 +11,10 @@ import Github from "./pages/Github";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Profile from "./components/Profile";
-
+import FacebookAdsPage from "./services/Facebook.Service";
+import GoogleAdSensePage from "./services/Google.Service";
+import InfluencerMarketing from "./services/Insta.Service";
+import AppPromotion from "./services/AppPromotion.service";
 const App = () => {
   return (
     <Router>
@@ -27,6 +30,10 @@ const App = () => {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="services/Facebook.Service" element={<FacebookAdsPage />} />
+          <Route path="services/Google.Service" element={<GoogleAdSensePage />} />
+          <Route path="services/Insta.Service" element={<InfluencerMarketing />} />
+          <Route path="services/AppPromotion.Service" element={<AppPromotion />} />
         </Route>
       </Routes>
     </Router>

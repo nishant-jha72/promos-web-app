@@ -31,9 +31,9 @@ const Profile = () => {
   return (
     <div className="max-w-md mx-auto mt-10 bg-white p-6 rounded shadow">
       <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
-
-      <form onSubmit={handleUpdate} className="space-y-4">
-
+    // handle form submission with handleUpdate
+      <form  className="space-y-4">
+        alert("The Feature is Stopped Till The Proudction Version");
         <input
           type="text"
           value={name}
