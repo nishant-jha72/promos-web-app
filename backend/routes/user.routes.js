@@ -10,12 +10,14 @@ const {
   changePassword,
   deleteUser,
   getProfile,
-  logoutUser
+  logoutUser,
+  verifyEmail
 } = require('../controllers/user.controller');
 
 // SPECIFIC ROUTES FIRST
 router.post('/register', registerUser); // .
 router.post('/login', loginUser); // 
+router.get("/verify-email" , verifyEmail); // Email verification route
 router.get('/profile/me', protect, getProfile);
 router.post('/logout', protect, logoutUser);
 router.post('/updateUser', protect, updateUser);

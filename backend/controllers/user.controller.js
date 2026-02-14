@@ -1,3 +1,5 @@
+const crypto = require('crypto'); // <--- Make sure this is here!
+const nodemailer = require('nodemailer');
 const asyncHandler = require('../utils/asyncHandler.util');
 const ApiError = require('../utils/ApiError.util');
 const ApiResponse = require('../utils/ApiResponse.util');
@@ -42,54 +44,62 @@ const senddetailes =  asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  // Validate required fields
+  // 1. Validate required fields
   if (!name || !email || !password) {
-    throw new ApiError(400, 'All fields are required', [
-      'Name, email, and password must be provided'
-    ]);
+    throw new ApiError(400, 'All fields are required');
   }
 
-  // Check if user already exists
+  // 2. Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError(409, 'User with this email already exists');
   }
 
-  // Create user
+  // 3. Generate Verification Token
+  const vToken = crypto.randomBytes(32).toString('hex');
+
+  // 4. Create User (isVerified defaults to false in Schema)
   const user = await User.create({
     name,
     email,
-    password
+    password, // Ensure your User model hashes this pre-save
+    verificationToken: vToken,
+    verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000 // Expire in 24h
   });
 
-  // Return user without password
-  const createdUser = await User.findById(user._id);
-
-  // Generate tokens
-  const accessToken = generateAccessToken(createdUser._id);
-  const refreshToken = generateRefreshToken(createdUser._id);
-
-  // Save refresh token to database
-  createdUser.refreshToken = refreshToken;
-  await createdUser.save();
-
-
-  res.cookie('accessToken', accessToken, cookieOptions);
-  res.cookie('refreshToken', refreshToken, {
-    ...cookieOptions,
-    maxAge: 30 * 24 * 60 * 60 * 1000
+  // 5. Setup Nodemailer
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'jnishant794@gmail.com',
+        pass: process.env.EMAIL_SENDER // Use environment variable for security
+    }
   });
 
+  const verificationUrl = `http://localhost:8000/api/v1/users/verify-email?token=${vToken}`;
+  
 
+  // 6. Send the Email
+  try {
+    await transporter.sendMail({
+      from: '"Your App Name" <jnishant794@gmail.com>',
+      to: email,
+      subject: "Verify your email address",
+      html: `<h1>Welcome ${name}!</h1>
+             <p>Please click the link below to verify your email:</p>
+             <a href="${verificationUrl}">Verify Email</a>`
+    });
+  } catch (error) {
+    // If email fails, you might want to remove the user or handle it
+    console.error("Email sending failed:", error);
+  }
+
+  // 7. Success Response (NO COOKIES SENT HERE)
   res.status(201).json(
     new ApiResponse(
       201, 
-      { 
-        user: createdUser,
-        accessToken,
-        refreshToken
-      }, 
-      'User registered successfully'
+      { userId: user._id }, 
+      'Registration successful! Please check your email to verify your account.'
     )
   );
 });
@@ -98,48 +108,53 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  // Validate required fields
+  // 1. Validate required fields
   if (!email || !password) {
     throw new ApiError(400, 'Email and password are required');
   }
 
-  // Find user and include password for comparison
+  // 2. Find user and include password
   const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
     throw new ApiError(401, 'Invalid email or password');
   }
 
-  // Check password
+  // 3. THE GATEKEEPER: Check if email is verified
+  // If not verified, we do not issue cookies
+  if (!user.isVerified) {
+    throw new ApiError(403, 'Your email is not verified. Please check your inbox to verify your account.');
+  }
+
+  // 4. Check password
   const isPasswordValid = await user.comparePassword(password);
 
   if (!isPasswordValid) {
     throw new ApiError(401, 'Invalid email or password');
   }
 
-  // Remove password from respons
-
-  // Generate tokens
+  // 5. Generate tokens
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
-  // Save refresh token to database
+  // 6. Save refresh token to database
   user.refreshToken = refreshToken;
   await user.save();
-  this.password = undefined; // Remove password from response
-   res.cookie('accessToken', accessToken, cookieOptions);
 
+  // Clean up user object for response
+  const loggedInUser = await User.findById(user._id);
+
+  // 7. Set Cookies
+  res.cookie('accessToken', accessToken, cookieOptions);
   res.cookie('refreshToken', refreshToken, {
     ...cookieOptions,
-    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days for refresh token
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
   });
 
   res.status(200).json(
     new ApiResponse(
       200, 
-      { 
-        user
-      }, 
+      { user: loggedInUser }, 
       'Login successful'
     )
   );
@@ -291,6 +306,26 @@ const logoutUser = asyncHandler(async (req, res) => {
   );
 });
 
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.query;
+
+    // Find user by token and ensure token hasn't expired
+    const user = await User.findOne({
+        verificationToken: token,
+        verificationTokenExpires: { $gt: Date.now() }
+    });
+
+    if (!user) return res.status(400).json({ message: "Token invalid or expired." });
+
+    // Mark as verified and clear tokens
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Email verified successfully! You can now log in." });
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -301,5 +336,6 @@ module.exports = {
   deleteUser,
   getProfile,
   logoutUser,
-  senddetailes
+  senddetailes,
+  verifyEmail
 };

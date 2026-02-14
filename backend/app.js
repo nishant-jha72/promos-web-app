@@ -10,8 +10,8 @@ const app = express();
 const allowedOrigins = [
   'https://promos-v1.netlify.app', // Your Netlify URL
   'http://localhost:5173',        // Your Local Development URL
-  'http://localhost:3000',
-  '*'
+  'http://localhost:8000',
+  'http://localhost:3000'
 ];
 app.use(cors({
   origin: function (origin, callback) {
@@ -42,9 +42,13 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the API' });
 });
 
+// app.get("/api/v1/users/verify-email", (req, res) => {
+//     res.send("If you see this, the route is finally working! Token received: " + req.query.token);
+// });
 
-
-app.use('/api/users', UserRoutes);
+// app.use('/api/users', UserRoutes);
+// Change this line in app.js:
+app.use('/api/v1/users', UserRoutes);
 
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({
